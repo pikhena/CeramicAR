@@ -1,8 +1,9 @@
 //
 //  ViewController.swift
-//  Dicee
+//  Ceramic AR
 //
 //  Created by Priscilla Ikhena on 13/01/2021.
+//  Copyright (c) 2021 Onivie Enterprises. All rights reserved.
 //
 
 import UIKit
@@ -15,9 +16,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     var videoArray = [SKVideoNode]() //array of all video nodes
     var planeArray = [SCNNode]() //array of all plane nodes
     var anchorArray = [ARImageAnchor]() //array of all ARImageAnchors
-    var readButtonCube = String()
+    static var readButtonCube = String()
+   // var readButtonCube = String()
     
-    
+    var cancelButtonPressedCount = 0
     let screenWidth  = UIScreen.main.bounds.width
     let screenHeight = UIScreen.main.bounds.height
   
@@ -26,13 +28,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     @IBOutlet weak var sceneView: ARSCNView!
     @IBOutlet weak var instructionLabel: UILabel!
     @IBOutlet weak var readButtonOutlet: UIButton!
-    @IBOutlet weak var cancelButtonOutlet: UIButton!
+   
     
     
-    
+  
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
         sceneView.delegate = self
         sceneView.autoenablesDefaultLighting = true
         
@@ -41,9 +44,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         readButtonOutlet.layer.borderColor = UIColor.white.cgColor
         readButtonOutlet.contentEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         
-        cancelButtonOutlet.layer.borderWidth = 1.0 / UIScreen.main.nativeScale
-        cancelButtonOutlet.layer.borderColor = UIColor.white.cgColor
-        cancelButtonOutlet.contentEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+       
         
     }
     
@@ -72,20 +73,46 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         //Pause the view's session
         sceneView.session.pause()
+     
     }
     
     
     //In this function, the image gets detected, and then the function that launches the video gets called.
-    
+    var rendercount = 0
     
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
             
             //Checks that we have detected an ARImageAnchor
+           
+            print(" in rendrer" , rendercount)
+            rendercount = rendercount + 1
             guard let imageAnchor = anchor as? ARImageAnchor else {return}
+            
+            if !anchorArray.isEmpty {
+                print(anchorArray[0])
+                for anchor in anchorArray {
+                    
+                    sceneView.session.remove(anchor: anchor)
+
+                }
+                anchorArray.removeAll()
+            }
+           
+            
+            if !videoArray.isEmpty {
+                  for videoNode in videoArray {
+                    videoNode.removeFromParent()
+
+                }
+                
+                videoArray.removeAll()
+        }
+        
             anchorArray.append(imageAnchor)
             let referenceImage = imageAnchor.referenceImage
             let referenceImageName = String(referenceImage.name!)
-            readButtonCube = referenceImageName
+            ViewController.readButtonCube = referenceImageName
+            
         
         
             //find our video file
@@ -104,7 +131,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         }
         
         else if referenceImageName == "Box6"{
-            videoNode = SKVideoNode(fileNamed: "Box6b.MOV")
+            videoNode = SKVideoNode(fileNamed: "Box6a.MOV")
         }
         
         else if referenceImageName == "Box7"{
@@ -122,8 +149,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             videoScene.addChild(videoNode)
             // add the video to videoArray for Cancel button
             videoArray.append(videoNode)
-        
             
+            
+           
+  
+        
             // creating a plane that has the same real world height and width as our detected image
             let plane = SCNPlane(width: imageAnchor.referenceImage.physicalSize.width, height: imageAnchor.referenceImage.physicalSize.height)
             // set the first materials content to be the video scene
@@ -145,45 +175,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
                showButtons()
         
+        print("this is the array count" , anchorArray.count)
+      
         }
     
-    
-    
-    //the Cancel button clears out all videos and all anchors, so that the session can repeatedly launch videos without having to quit the app.
-    //**Need to make this Cancel button work well.
-    
-    @IBAction func cancelButton(_ sender: Any) {
-        //the
-        
-        if !planeArray.isEmpty {
-            for planeNode in planeArray {
-                planeNode.removeFromParentNode()
-               
-              //  videoNode.removeAllActions()
-            }
-        }
-        
-        if !anchorArray.isEmpty {
-            for anchor in anchorArray {
-                sceneView.session.remove(anchor: anchor)
-            }
-            
-       
-        }
-        
-        if !videoArray.isEmpty {
-            for videoNode in videoArray {
-                videoNode.removeFromParent()
-            }
-        }
-        
-       hideButtons()
-        DispatchQueue.main.async {
-               self.instructionLabel.isHidden = false
-        }
-        
-        
-    }
     
     
     
@@ -191,38 +186,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     
     @IBAction func readButton(_ sender: Any) {
-        if (readButtonCube == "Box1") {
-            print("Box1 does...")
-        }
-        
-        else if (readButtonCube == "Box2") {
-            print("Box2 does...")
-        }
-        
-        else if (readButtonCube == "Box3") {
-            print("Box3 does...")
-        }
-        
-        else if (readButtonCube == "Box4") {
-            print("Box4 does...")
-        }
-        
-        else if (readButtonCube == "Box5") {
-            print("Box5 does...")
-        }
-        
-        else if (readButtonCube == "Box6") {
-            print("Box6 does...")
-        }
-        
-        else if (readButtonCube == "Box7") {
-            print("Box7 does...")
-        }
-        
-        else if (readButtonCube == "Box8") {
-            print("Box8 does...")
-        }
-    }
+       
+        self.performSegue(withIdentifier: "goToReadMore", sender: self)
+  }
     
     
     
@@ -231,7 +197,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     func showButtons() {
 
         DispatchQueue.main.async {
-            self.cancelButtonOutlet.isHidden = false
+           
             self.readButtonOutlet.isHidden = false
             
         }
@@ -242,7 +208,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 // function to hide action buttons
     func hideButtons(){
         DispatchQueue.main.async {
-            self.cancelButtonOutlet.isHidden = true
+           
             self.readButtonOutlet.isHidden = true
            
         }
