@@ -23,16 +23,16 @@ class CubeStoryViewController: UIViewController {
 override func viewWillAppear(_ animated: Bool) {
    
     super.viewWillAppear(animated)
+    //code for the presentation of the cube details
     cubedetails.numberOfLines = 200
     cubedetails.textColor = UIColor.white
     viewPane.backgroundColor = UIColor.black
     viewPane.alpha = 0.5
+    
+    //Gets the right Cube that is being viewed by the user, and presents the right information for the cube.
     let cubeNumber =  ViewController.readButtonCube
-    print("this is cube number in Cube Story" + cubeNumber)
-    
-    //how do we get this information from the other class?
-  
-    
+
+
     if cubeNumber == "Box1" {
         cubedetails.text = "Cube ONE is about Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce pretium scelerisque metus, porta lacinia nisi. Vivamus a finibus quam, a bibendum ipsum. Phasellus pharetra volutpat eros, eu bibendum ipsum rhoncus non."
     }
@@ -68,16 +68,6 @@ override func viewWillAppear(_ animated: Bool) {
     }
 }
 
-//        super.viewWillAppear(animated)
-//        print("view has appeared")
-//        if (cancelButtonPressedCount % 2 == 0){
-//            CubeStory.setTitle("PAUSE", for: .normal)
-//            //write code to pause video
-//
-//        }
-//
-        
-      //  }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

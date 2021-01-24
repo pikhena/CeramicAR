@@ -17,11 +17,17 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     var planeArray = [SCNNode]() //array of all plane nodes
     var anchorArray = [ARImageAnchor]() //array of all ARImageAnchors
     static var readButtonCube = String()
-   // var readButtonCube = String()
+    var rendercount = 0
+  
+    @IBOutlet weak var infoButton: UIButton!
+    @IBOutlet weak var secondInstruction: UILabel!
     
-    var cancelButtonPressedCount = 0
-    let screenWidth  = UIScreen.main.bounds.width
-    let screenHeight = UIScreen.main.bounds.height
+    @IBAction func infoButton(_ sender: Any) {
+        //self.performSegue(withIdentifier: "goToWelcomePage", sender: self)
+        
+    }
+    
+   
   
     
     @IBOutlet var UIView: UIView!
@@ -29,13 +35,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     @IBOutlet weak var instructionLabel: UILabel!
     @IBOutlet weak var readButtonOutlet: UIButton!
    
-    
-    
   
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        
+      
+        // Additional setup after loading the view.
         sceneView.delegate = self
         sceneView.autoenablesDefaultLighting = true
         
@@ -44,10 +48,15 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         readButtonOutlet.layer.borderColor = UIColor.white.cgColor
         readButtonOutlet.contentEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         
+        
+          
+        
+        
        
         
     }
     
+   
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -60,8 +69,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.session.run(configuration)
   
         
-            //Hide all buttons initially
-        hideButtons()
+        //Hide the other buttons initially
+        hideReadMoreButton()
+        hideSecondInstruction()
      
         
         }
@@ -78,14 +88,12 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     
     //In this function, the image gets detected, and then the function that launches the video gets called.
-    var rendercount = 0
+  
     
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
             
+            hideSecondInstruction()
             //Checks that we have detected an ARImageAnchor
-           
-            print(" in rendrer" , rendercount)
-            rendercount = rendercount + 1
             guard let imageAnchor = anchor as? ARImageAnchor else {return}
             
             if !anchorArray.isEmpty {
@@ -116,7 +124,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         
             //find our video file
-            //**add conditional statements here on what video to play based on the
             var videoNode = SKVideoNode()
         if referenceImageName == "Box1"{
             videoNode = SKVideoNode(fileNamed: "Box1.MOV")
@@ -147,12 +154,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             videoNode.yScale = -1.0
             // add the video to scene
             videoScene.addChild(videoNode)
-            // add the video to videoArray for Cancel button
+            // add the video to videoArray
             videoArray.append(videoNode)
             
             
-           
-  
+    
         
             // creating a plane that has the same real world height and width as our detected image
             let plane = SCNPlane(width: imageAnchor.referenceImage.physicalSize.width, height: imageAnchor.referenceImage.physicalSize.height)
@@ -173,16 +179,22 @@ class ViewController: UIViewController, ARSCNViewDelegate {
                       self.instructionLabel.isHidden = true
               }
         
-               showButtons()
+               showReadMoreButton()
+        if rendercount == 0{
+               showSecondInstruction()
+        }
+        rendercount = rendercount + 1
+          
+                
         
-        print("this is the array count" , anchorArray.count)
+       
       
         }
     
     
     
     
-    //if Read/Cubestory is pressed, we want to overlay the video with information about the memory cube.
+    //if Read Cube Story is pressed, we want to overlay the video with information about the memory cube.
     
     
     @IBAction func readButton(_ sender: Any) {
@@ -192,9 +204,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     
     
-  //function to display action buttons
+  //function to display read more button
 
-    func showButtons() {
+    func showReadMoreButton() {
 
         DispatchQueue.main.async {
            
@@ -205,14 +217,34 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     
-// function to hide action buttons
-    func hideButtons(){
+// function to hide read more button
+    func hideReadMoreButton(){
         DispatchQueue.main.async {
            
             self.readButtonOutlet.isHidden = true
            
         }
     }
+    
+    // function to hide second instruction
+        func hideSecondInstruction(){
+            DispatchQueue.main.async {
+               
+                self.secondInstruction.isHidden = true
+               
+            }
+        }
+    
+    //function to display second instruction
+
+      func showSecondInstruction() {
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+            self.secondInstruction.isHidden = false
+        }
+        hideSecondInstruction()
+
+      }
         
     }
 
