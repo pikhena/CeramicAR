@@ -145,6 +145,18 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             videoNode = SKVideoNode(fileNamed: "Box7.MOV")
         }
         
+        else if referenceImageName == "Box3"{
+            videoNode = SKVideoNode(fileNamed: "Box3.MOV")
+        }
+        
+        else if referenceImageName == "Box5"{
+            videoNode = SKVideoNode(fileNamed: "Box5.MOV")
+        }
+        
+        else if referenceImageName == "Box8"{
+            videoNode = SKVideoNode(fileNamed: "Box8.MOV")
+        }
+        
             videoNode.play()
             // setting the size of the video scene
             let videoScene = SKScene(size: CGSize(width: 480, height: 360))
